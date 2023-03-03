@@ -36,20 +36,27 @@ while True:
     labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
     domainEmotion = labels[emotion_index]
 
-    # for x, y, face_width, face_height in emotion_probability:
-    #     # prostokat
-    #     cv2.rectangle(frame, (x, y), (x + face_width, y + face_height), (0, 0, 255), 3)
+    # Utworzenie przezroczystego prostokąta
+    color = (0, 0, 0)  # kolor czarny
+    x, y = 0, 0  # położenie lewego górnego rogu
+    w, h = 210, 260  # szerokość i wysokość
+    alpha = 0.5  # wartość przeźroczystości
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (x, y), (x + w, y + h), color, -1)  # ustawienie przeźroczystości
+    # Dodanie efektu przezroczystości
+    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
 
     # wyświetlenie wyniku na obrazie
     text = f"Emotion: {domainEmotion}, \n probability: {emotion_probability}"
-    cv2.putText(frame, domainEmotion, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+    cv2.putText(frame, domainEmotion, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2, cv2.LINE_AA)
 
     emotion_text = ""
     for i, probability in enumerate(emotion_probability):
         emotion = emotion_dict[i]
         probability = round(probability * 100, 2)
         emotion_text = f" {emotion}: {probability}%  "
-        cv2.putText(frame, emotion_text, (10, 30 + i * 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+        cv2.putText(frame, emotion_text, (10, 60 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 1, cv2.LINE_AA)
 
     cv2.imshow("Emotion Recognition", frame)
 
