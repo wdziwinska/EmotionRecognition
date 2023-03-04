@@ -18,6 +18,38 @@ emotion_dict = {
     6: "neutral"
 }
 
+# Wczytanie kaskady klasyfikatorów Haar do wykrywania twarzy
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+def rectangleBackground():
+    # Utworzenie przezroczystego prostokąta
+    color = (0, 0, 0)  # kolor czarny
+    x, y = 0, 0  # położenie lewego górnego rogu
+    w, h = 210, 260  # szerokość i wysokość
+    alpha = 0.5  # wartość przeźroczystości
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (x, y), (x + w, y + h), color, -1)  # ustawienie przeźroczystości
+    # Dodanie efektu przezroczystości
+    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+
+def textDsplaying(i, probability):
+    emotion = emotion_dict[i]
+    probability = round(probability * 100, 2)
+    emotion_text = f" {emotion}: {probability}%  "
+
+    cv2.putText(frame, emotion_text, (10, 60 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 1, cv2.LINE_AA)
+
+def faceRectangle():
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Wykrycie twarzy na ramce
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+
+    # Rysowanie prostokąta wokół wykrytej twarzy
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+
 while True:
     # pobierz obraz z kamery
     ret, frame = cap.read()
@@ -36,15 +68,8 @@ while True:
     labels = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
     domainEmotion = labels[emotion_index]
 
-    # Utworzenie przezroczystego prostokąta
-    color = (0, 0, 0)  # kolor czarny
-    x, y = 0, 0  # położenie lewego górnego rogu
-    w, h = 210, 260  # szerokość i wysokość
-    alpha = 0.5  # wartość przeźroczystości
-    overlay = frame.copy()
-    cv2.rectangle(overlay, (x, y), (x + w, y + h), color, -1)  # ustawienie przeźroczystości
-    # Dodanie efektu przezroczystości
-    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+    rectangleBackground()
+    faceRectangle()
 
     # wyświetlenie wyniku na obrazie
     text = f"Emotion: {domainEmotion}, \n probability: {emotion_probability}"
@@ -52,11 +77,7 @@ while True:
 
     emotion_text = ""
     for i, probability in enumerate(emotion_probability):
-        emotion = emotion_dict[i]
-        probability = round(probability * 100, 2)
-        emotion_text = f" {emotion}: {probability}%  "
-
-        cv2.putText(frame, emotion_text, (10, 60 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 1, cv2.LINE_AA)
+        textDsplaying(i, probability)
 
     cv2.imshow("Emotion Recognition", frame)
 
