@@ -17,11 +17,15 @@ model.add(MaxPooling2D((2, 2)))
 model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(MaxPooling2D((2, 2)))
 
+# warstwa konwolucyjna
+model.add(Conv2D(256, (3, 3), activation='relu'))
+model.add(MaxPooling2D((2, 2)))
+
 # warstwa wypłaszczająca
 model.add(Flatten())
 
 # warstwa ukryta
-model.add(Dense(128, activation='relu'))
+model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
 
 EMOTIONS = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
@@ -38,6 +42,6 @@ data_gen = ImageDataGenerator(rescale=1./255)
 # wczytanie danych treningowych za pomocą generatora - wykorzystanie generatora do wczytania danych treningowych
 train_data = data_gen.flow_from_directory("train_fer", target_size=(48, 48), color_mode='grayscale', batch_size=32, class_mode='categorical')
 # trenowanie modelu na danych treningowych przez 50 epok
-model.fit(train_data, epochs=50)
+model.fit(train_data, epochs=150)
 
 model.save('emotions_detection_fer_model.h5')
