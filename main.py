@@ -24,31 +24,11 @@ face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 def rectangleBackground(x, y, w, h):
     # Utworzenie przezroczystego prostokąta
     color = (0, 0, 0)  # kolor czarny
-    x, y = 0, 0  # położenie lewego górnego rogu
-    w, h = 210, 260  # szerokość i wysokość
     alpha = 0.5  # wartość przeźroczystości
     overlay = frame.copy()
     cv2.rectangle(overlay, (x, y), (x + w, y + h), color, -1)  # ustawienie przeźroczystości
     # Dodanie efektu przezroczystości
     cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
-
-def textDsplaying(i, probability):
-    emotion = emotion_dict[i]
-    probability = round(probability * 100, 2)
-    emotion_text = f" {emotion}: {probability}%  "
-
-    cv2.putText(frame, emotion_text, (10, 60 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 1, cv2.LINE_AA)
-
-def faceRectangle():
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Wykrycie twarzy na ramce
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
-
-    # Rysowanie prostokąta wokół wykrytej twarzy
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
 
 while True:
     # pobierz obraz z kamery
@@ -86,22 +66,31 @@ while True:
         # Znalezienie indeksu klasy z najwyższą wartością prawdopodobieństwa
         max_index = int(np.argmax(prediction))
 
-        rectangleBackground(x, y, w, -35)
+        rectangleBackground(x, y-10, w, -35)
         # Wypisanie emocji na obrazie
-        cv2.putText(frame, labels[max_index], (x + 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (50, 0, 255), 2)
-        # cv2.putText(frame, domainEmotion, (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(frame, labels[max_index], (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
+        # cv2.putText(frame, domainEmotion, (x, y-5), cv2.FNT_HERSHEY_SIMPLEX, 0.85, (255, 255, 255), 2, cv2.LINE_AA)
 
-        rectangleBackground(0, 0, 170, 200)
+        rectangleBackground(x, y+h+20, 160, 80)
 
+        emotion_probabilities = []
         for i, probability in enumerate(prediction):
             emotion = emotion_dict[i]
             probability = round(probability * 100, 2)
-            emotion_text = f" {emotion}: {probability}%  "
+            # emotion_text = f" {emotion}: {probability}%  "
+            emotion_probabilities.append((emotion, probability))
 
-            cv2.putText(frame, emotion_text, (5, 25 + i * 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1,
+        sorted_emotion_probabilities = sorted(emotion_probabilities, key=lambda x: x[1], reverse=True)
+
+        # Wybierz trzy emocje z najwyższymi wartościami predicted probabilities
+        top_emotions = sorted_emotion_probabilities[:3]
+
+        for i, (emotion, probability) in enumerate(top_emotions):
+            emotion_text = f"{emotion}: {probability}%  "
+
+            cv2.putText(frame, emotion_text, (x, y+h+40 + i * 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1,
                         cv2.LINE_AA)
-        textDsplaying(i, probability)
 
     cv2.imshow("Emotion Recognition", frame)
 
