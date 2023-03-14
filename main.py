@@ -2,18 +2,7 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
-# ładuj model
-model = load_model('emotions_detection_fer_model.h5')
-
-# otwórz kamerę
-cap = cv2.VideoCapture(0)
-
-emotion_dictionary = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
-
-# Wczytanie kaskady klasyfikatorów Haar do wykrywania twarzy
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-
-def rectangleBackground(x, y, w, h):
+def rectangle_background(x, y, w, h):
     # Utworzenie przezroczystego prostokąta
     color = (0, 0, 0)  # kolor czarny
     alpha = 0.5  # wartość przeźroczystości
@@ -22,7 +11,7 @@ def rectangleBackground(x, y, w, h):
     # Dodanie efektu przezroczystości
     cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
 
-def top3Emotions():
+def top_3_emotions():
     emotion_probabilities = []
     for i, probability in enumerate(prediction):
         emotion = emotion_dictionary[i]
@@ -40,8 +29,19 @@ def top3Emotions():
         cv2.putText(frame, emotion_text, (x, y + h + 40 + i * 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1,
                     cv2.LINE_AA)
 
+# ładowanie modelu
+model = load_model('emotions_detection_fer_model.h5')
+
+# otworzenie kamery
+cap = cv2.VideoCapture(0)
+
+emotion_dictionary = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+
+# Wczytanie kaskady klasyfikatorów Haar do wykrywania twarzy
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
 while True:
-    # pobierz obraz z kamery
+    # pobieranie obrazu z kamery
     ret, frame = cap.read()
 
     emotion_text = ""
@@ -64,17 +64,18 @@ while True:
         # Znalezienie indeksu klasy z najwyższą wartością prawdopodobieństwa
         max_index = int(np.argmax(prediction))
 
-        rectangleBackground(x, y-10, w, -35)
+        rectangle_background(x, y - 10, w, -35)
         # Wypisanie emocji na obrazie oraz zaznaczenie prostokątem twarzy
-        cv2.putText(frame, emotion_dictionary[max_index], (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
+        cv2.putText(frame, emotion_dictionary[max_index], (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
+                    (255, 255, 255), 2)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
 
-        rectangleBackground(x, y+h+20, 160, 80)
-        top3Emotions()
+        rectangle_background(x, y + h + 20, 160, 80)
+        top_3_emotions()
 
     cv2.imshow("Emotion Recognition", frame)
 
-    # zakończ program po wciśnięciu klawisza 'esc'
+    # zakończenie programu po wciśnięciu klawisza 'esc'
     key = cv2.waitKey(50)
     if key == 27:
         break
