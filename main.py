@@ -68,13 +68,14 @@ while True:
         # Znalezienie indeksu klasy z najwyższą wartością prawdopodobieństwa
         max_index = int(np.argmax(prediction))
 
+        font_size_main_emotion = w / 225
         rectangle_background(x, y - 10, w, -35)
         # Wypisanie emocji na obrazie oraz zaznaczenie prostokątem twarzy
-        cv2.putText(frame, emotion_dictionary[max_index], (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
+        cv2.putText(frame, emotion_dictionary[max_index], (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, font_size_main_emotion,
                     (255, 255, 255), 2)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
 
-        rectangle_background(x, y + h + 20, 160, 80)
+        rectangle_background(x, y + h + 20, w, int(h/2))
         top_3_emotions()
 
     # Wyświetelenie obrazu z kamery na ekranie użytkownika w oknie o nazwie 'Emotion Recognition'
