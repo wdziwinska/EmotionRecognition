@@ -25,8 +25,8 @@ def top_3_emotions():
 
     for i, (emotion, probability) in enumerate(top_emotions):
         emotion_text = f"{emotion}: {probability}%  "
-
-        cv2.putText(frame, emotion_text, (x, y + h + 40 + i * 25), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1,
+        font_size = w / 285
+        cv2.putText(frame, emotion_text, (x, y + h + 40 + i * int(h/6)), cv2.FONT_HERSHEY_SIMPLEX, font_size, (255, 255, 255), 1,
                     cv2.LINE_AA)
 
 # ładowanie modelu
@@ -48,15 +48,19 @@ while True:
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Wykrycie twarzy na ramce
+    # Wykrycie twarzy na ramce. detectMultiScale zwraca x, y, w, h
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
 
     # Wykrycie każdej twarzy
     for (x, y, w, h) in faces:
+        # wycięcie fragmentu obrazu, samą twarz
         face = gray[y:y + h, x:x + w]
+        # przekształcenie obrazu
         face = cv2.resize(face, (48, 48))
         face = face / 255.0
+        # Przetwarzany fragment obrazu zostaje przekształcaon do postaci tenosora. 1 - przetwarzana jest tylko jedna twarz na raz, 48 i 48 to szewrokość i wysokość, 1 - obraz jest w skali szarości
         face = face.reshape(1, 48, 48, 1)
+        # Uzyskanie predykcji dla danej twarzy. [0] oznacza, że pobierana jest pierwsza wartość tensora.
         prediction = model.predict(face)[0]
 
         print("emotion_probability: ", prediction)
@@ -73,6 +77,7 @@ while True:
         rectangle_background(x, y + h + 20, 160, 80)
         top_3_emotions()
 
+    # Wyświetelenie obrazu z kamery na ekranie użytkownika w oknie o nazwie 'Emotion Recognition'
     cv2.imshow("Emotion Recognition", frame)
 
     # zakończenie programu po wciśnięciu klawisza 'esc'
