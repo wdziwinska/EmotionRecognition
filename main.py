@@ -8,8 +8,7 @@ def rectangle_background(x, y, w, h):
     alpha = 0.5  # wartość przeźroczystości
     overlay = frame.copy()
     cv2.rectangle(overlay, (x, y), (x + w, y + h), color, -1)  # ustawienie przeźroczystości
-    # Dodanie efektu przezroczystości
-    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)  # dodanie efektu przezroczystości
 
 def top_3_emotions():
     emotion_probabilities = []
@@ -26,19 +25,13 @@ def top_3_emotions():
     for i, (emotion, probability) in enumerate(top_emotions):
         emotion_text = f"{emotion}: {probability}%  "
         font_size = w / 285
-        cv2.putText(frame, emotion_text, (x, y + h + 40 + i * int(h/6)), cv2.FONT_HERSHEY_SIMPLEX, font_size, (255, 255, 255), 1,
+        cv2.putText(frame, emotion_text, (x, y + h + 20 + int(h/8) + i * int(h/6)), cv2.FONT_HERSHEY_SIMPLEX, font_size, (255, 255, 255), 1,
                     cv2.LINE_AA)
 
-# ładowanie modelu
-model = load_model('emotions_detection_fer_model.h5')
-
-# otworzenie kamery
+model = load_model('emotions_detection_fer_mod.h5')
 cap = cv2.VideoCapture(0)
-
-emotion_dictionary = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
-
-# Wczytanie kaskady klasyfikatorów Haar do wykrywania twarzy
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+emotion_dictionary = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
+face_cascade= cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 while True:
     # pobieranie obrazu z kamery
@@ -68,14 +61,15 @@ while True:
         # Znalezienie indeksu klasy z najwyższą wartością prawdopodobieństwa
         max_index = int(np.argmax(prediction))
 
-        font_size_main_emotion = w / 225
-        rectangle_background(x, y - 10, w, -35)
-        # Wypisanie emocji na obrazie oraz zaznaczenie prostokątem twarzy
-        cv2.putText(frame, emotion_dictionary[max_index], (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, font_size_main_emotion,
+        font_size = w / 225
+        rectangle_background(x, y - 10, w, - int(h / 5))
+        cv2.putText(frame, emotion_dictionary[max_index],
+                    (x + 10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, font_size,
                     (255, 255, 255), 2)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h),
+                      (255, 255, 255), 2)
 
-        rectangle_background(x, y + h + 20, w, int(h/2))
+        rectangle_background(x, y + h + 20, w, int(h / 2))
         top_3_emotions()
 
     # Wyświetelenie obrazu z kamery na ekranie użytkownika w oknie o nazwie 'Emotion Recognition'
