@@ -3,11 +3,13 @@
 The app recognizes seven emotions based on the face image.
 
 ## instaling library
-To be able to run the program, the following libraries must be installed
+To be able to run the program, the libraries must be installed
 
-* pip install keras
-* pip install opencv-python
-* pip install numpy
+``` 
+pip install -r requirements.txt 
+```
+
+Then run main.py
 
 ## application operation
 ![happy](https://user-images.githubusercontent.com/55066543/225155062-2fe78444-a847-4b2f-9253-a557da28177e.png)
