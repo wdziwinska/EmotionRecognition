@@ -28,7 +28,7 @@ def top_3_emotions():
         cv2.putText(frame, emotion_text, (x, y + h + 20 + int(h/8) + i * int(h/6)), cv2.FONT_HERSHEY_SIMPLEX, font_size, (255, 255, 255), 1,
                     cv2.LINE_AA)
 
-model = load_model('emotions_detection_fer_mod.h5')
+model = load_model('emotions_detection_model_fer.h5')
 cap = cv2.VideoCapture(0)
 emotion_dictionary = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
 face_cascade= cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -55,10 +55,6 @@ while True:
         face = face.reshape(1, 48, 48, 1)
         # Uzyskanie predykcji dla danej twarzy. [0] oznacza, że pobierana jest pierwsza wartość tensora.
         prediction = model.predict(face)[0]
-
-        print("emotion_probability: ", prediction)
-
-        # Znalezienie indeksu klasy z najwyższą wartością prawdopodobieństwa
         max_index = int(np.argmax(prediction))
 
         font_size = w / 225
@@ -72,7 +68,6 @@ while True:
         rectangle_background(x, y + h + 20, w, int(h / 2))
         top_3_emotions()
 
-    # Wyświetelenie obrazu z kamery na ekranie użytkownika w oknie o nazwie 'Emotion Recognition'
     cv2.imshow("Emotion Recognition", frame)
 
     # zakończenie programu po wciśnięciu klawisza 'esc'

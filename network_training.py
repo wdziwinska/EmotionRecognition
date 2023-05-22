@@ -106,7 +106,7 @@ train_data = data_gen_train.flow_from_directory("train", target_size=(48, 48), c
 validation_data = data_gen_val.flow_from_directory("test", target_size=(48, 48), color_mode='grayscale', batch_size=32, class_mode='categorical')
 
 # callbacki
-checkpoint = ModelCheckpoint('emotions_detection_fer_mod.h5', monitor='val_accuracy', save_best_only=True, verbose=1)
+checkpoint = ModelCheckpoint('emotions_detection_model_fer.h5', monitor='val_accuracy', save_best_only=True, verbose=1)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=10, verbose=1, min_delta=0.0001)
 
 # trenowanie modelu na danych treningowych przez 100 epok

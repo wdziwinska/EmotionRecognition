@@ -4,13 +4,10 @@ import numpy as np
 from keras.models import load_model
 
 # Wczytanie wytrenowanej sieci neuronowej
-model = load_model('emotions_detection_fer_model_new2.h5')
+model = load_model('emotions_detection_model_fer.h5')
 
 # Utworzenie listy emocji
 emotions = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
-
-# Utworzenie słownika, aby przyporządkować każdej emocji indeks
-emotion_dict = {'angry': 0, 'disgust': 1, 'fear': 2, 'happy': 3, 'neutral': 4, 'sad': 5, 'surprise': 6}
 
 # Ścieżka do folderu z testowymi zdjęciami
 test_dir = 'test_fer'
@@ -30,7 +27,7 @@ for root, dirs, files in os.walk(test_dir):
         # Przekształcenie zdjęcia na czarno-białe
         img = cv2.imread(os.path.join(root, file), cv2.IMREAD_GRAYSCALE)
 
-        # Przekształcenie zdjęcia do wymaganego rozmiaru (np. 48x48 pikseli)
+        # Przekształcenie zdjęcia do wymaganego rozmiaru (48x48 pikseli)
         img = cv2.resize(img, (48, 48))
 
         # Normalizacja pikseli do zakresu od 0 do 1
@@ -64,4 +61,4 @@ for emotion in emotions:
 
 # Obliczenie ogólnej dokładności sieci neuronowej
 overall_accuracy = sum(correct_predictions_dict.values()) / sum(image_counts_dict.values())
-print(f"Ogólna dokładność sieci neuronwej:  {overall_accuracy * 100:.2f}%")
+print(f"Ogólna dokładność sieci neuronowej:  {overall_accuracy * 100:.2f}%")
